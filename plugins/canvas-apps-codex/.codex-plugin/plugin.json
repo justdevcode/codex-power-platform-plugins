@@ -1,0 +1,43 @@
+{
+  "name": "canvas-apps-codex",
+  "version": "2.1.0-codex.1",
+  "description": "Create, edit, validate, and sync Power Apps Canvas Apps using Codex and the Canvas Authoring MCP server.",
+  "author": {
+    "name": "Justin de Vantier",
+    "url": "https://github.com/YOUR-GITHUB-USERNAME"
+  },
+  "homepage": "https://github.com/YOUR-GITHUB-USERNAME/justin-codex-power-platform-plugins",
+  "repository": "https://github.com/YOUR-GITHUB-USERNAME/justin-codex-power-platform-plugins",
+  "license": "MIT",
+  "keywords": [
+    "power-platform",
+    "power-apps",
+    "canvas-apps",
+    "codex",
+    "mcp",
+    "power-fx",
+    "pa-yaml",
+    "msapp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Canvas Apps for Codex",
+    "shortDescription": "Build and edit Power Apps Canvas Apps with Codex",
+    "longDescription": "A Codex-compatible adaptation of Microsoft\u2019s Canvas Apps Power Platform workflow. It bundles the Canvas Authoring MCP server and skills for configuring, creating, editing, validating, and syncing Canvas Apps from .pa.yaml source files.",
+    "developerName": "Justin de Vantier",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "Configure the Canvas Authoring MCP server for my open Power Apps Studio app.",
+      "Create a simple Canvas App from requirements.",
+      "Edit the current Canvas App using the live coauthoring session.",
+      "List available Canvas App controls."
+    ],
+    "brandColor": "#0078D4"
+  }
+}

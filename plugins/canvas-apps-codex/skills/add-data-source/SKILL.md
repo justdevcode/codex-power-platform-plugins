@@ -1,0 +1,66 @@
+---
+name: add-data-source
+version: 1.0.0-codex.1
+description: Guide the user to add a data source, connection, or API connector to a Canvas App through Power Apps Studio, then verify it via the Canvas Authoring MCP server.
+author: Microsoft Corporation / Codex adaptation
+---
+
+Data sources, connections, and API connectors cannot be added by the coding agent — they must be added through the Power Apps Studio interface. This skill informs the user, guides them to add the connection in their Studio session, verifies it is available via the MCP server, and then continues with any pending work.
+
+## Phase 0 — Identify the Connection Type
+
+From the user's request, determine what they want to add and how to verify it:
+
+| Request type | Verify with |
+|---|---|
+| Data source (SharePoint list, Dataverse table, SQL table, Excel file, OneDrive, etc.) | `list_data_sources` |
+| API / connector (Office 365 Users, Teams, custom connector, etc.) | `list_apis` |
+| Unclear | Both `list_data_sources` and `list_apis` |
+
+Note what the user is trying to add so you can look for it by name in Phase 3.
+
+## Phase 1 — Inform the User
+
+Explain that this step requires action in their Studio session. Tell the user:
+
+- The coding agent cannot add data sources or connections programmatically — this must be done directly in Power Apps Studio.
+- To add the connection, follow these steps in their open Studio session:
+  1. Open the **Data** panel in the left sidebar
+  2. Click **Add data**
+  3. Search for the data source or connector they want (e.g., "SharePoint", "Dataverse", "SQL Server", "Office 365 Users")
+  4. Follow the authentication prompts and select the specific table, list, file, or dataset
+- Once added, the connection will be available to the MCP server and you can continue.
+
+## Phase 2 — Wait for Confirmation
+
+Pause and ask the user to reply when they have completed the steps in Studio:
+
+> "Please add the data source or connection in your Power Apps Studio session. Reply here when it's ready and I'll verify the connection before continuing."
+
+Do not proceed until the user confirms they have added it.
+
+## Phase 3 — Verify the Connection
+
+Once the user confirms, call the appropriate MCP tools to check that the connection is now available:
+
+- If the request was for a **data source**: call `list_data_sources`
+- If the request was for an **API / connector**: call `list_apis`
+- If the type was unclear: call both; if parallel MCP calls are unavailable, call them sequentially
+
+Scan the results for the connection the user added:
+
+**Found** — Confirm to the user that the data source or connection is now visible to the agent. Include the exact name as returned by the MCP tool (this is how it must be referenced in Power Fx formulas). If it is a data source, call `get_data_source_schema` to retrieve its column names and types, and include the schema summary in your response so it is ready for use in edits. Similarly, for APIs/connectors, call `describe_api` to retrieve the available endpoints and their parameters, and include the schema summary in your response.
+
+**Not found** — Inform the user that the connection is not yet visible. Ask them to:
+1. Confirm they completed the Studio steps and the connection appears in the Data panel there.
+2. Check that their Studio session is still active (the MCP server must be connected to a live coauthoring session).
+3. Let you know when ready to try again.
+
+Wait for the user's follow-up, then re-run Phase 3.
+
+## Phase 4 — Continue
+
+After the connection is confirmed:
+
+- If the user had a pending task (e.g., "add SharePoint as a data source, then build a gallery"), continue with that work now using the verified connection name and schema.
+- If adding the connection was the only request, summarize what was confirmed (connection name, type, and schema if applicable) and suggest a natural next step (e.g., building a screen or gallery that uses the new data).

@@ -1,0 +1,20 @@
+{
+  "name": "justin-power-platform-plugins",
+  "interface": {
+    "displayName": "Justin Power Platform Plugins"
+  },
+  "plugins": [
+    {
+      "name": "canvas-apps-codex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/canvas-apps-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
