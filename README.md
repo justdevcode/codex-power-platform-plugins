@@ -81,4 +81,4 @@ It also references the earlier Codex port by Ratnam Mishra:
 https://github.com/Ratnam-Mishra/canvas-apps-plugin-codex
 ```
 
-This repository is not an official Microsoft release..
+This repository is not an official Microsoft release.
