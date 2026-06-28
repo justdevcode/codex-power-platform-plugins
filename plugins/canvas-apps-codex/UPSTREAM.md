@@ -8,7 +8,7 @@ Generated on: 2026-06-26 08:51:16 UTC from uploaded ZIP files.
 |---|---|
 | Microsoft upstream Canvas Apps plugin | `canvas-apps.zip` |
 | Ratnam Codex port | `canvas-apps-plugin-codex.zip` |
-| Previous generated draft | `justin-codex-power-platform-plugins(1).zip` |
+| Previous generated draft | `codex-power-platform-plugins(1).zip` |
 
 ## Microsoft upstream plugin metadata
 

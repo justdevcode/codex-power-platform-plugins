@@ -28,7 +28,7 @@ The `.agents/plugins/marketplace.json` file tells Codex where the plugin lives i
 After pushing this repository to GitHub, add it to Codex:
 
 ```powershell
-codex plugin marketplace add https://github.com/YOUR-GITHUB-USERNAME/justin-codex-power-platform-plugins.git --ref main
+codex plugin marketplace add https://github.com/YOUR-GITHUB-USERNAME/codex-power-platform-plugins.git --ref main
 ```
 
 Then start Codex and run:
@@ -62,7 +62,7 @@ Provide the Power Apps Studio URL when prompted.
 Edit this placeholder in `plugins/canvas-apps-codex/.codex-plugin/plugin.json`:
 
 ```json
-"repository": "https://github.com/YOUR-GITHUB-USERNAME/justin-codex-power-platform-plugins"
+"repository": "https://github.com/YOUR-GITHUB-USERNAME/codex-power-platform-plugins"
 ```
 
 Replace `YOUR-GITHUB-USERNAME` with your GitHub username.

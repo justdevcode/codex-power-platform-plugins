@@ -4,10 +4,10 @@
   "description": "Create, edit, validate, and sync Power Apps Canvas Apps using Codex and the Canvas Authoring MCP server.",
   "author": {
     "name": "Justin de Vantier",
-    "url": "https://github.com/YOUR-GITHUB-USERNAME"
+    "url": "https://github.com/justdevcode"
   },
-  "homepage": "https://github.com/YOUR-GITHUB-USERNAME/justin-codex-power-platform-plugins",
-  "repository": "https://github.com/YOUR-GITHUB-USERNAME/justin-codex-power-platform-plugins",
+  "homepage": "https://github.com/justdevcode/codex-power-platform-plugins",
+  "repository": "https://github.com/justdevcode/codex-power-platform-plugins",
   "license": "MIT",
   "keywords": [
     "power-platform",
