@@ -1,4 +1,4 @@
-# Justin Codex Power Platform Plugins
+# Codex Power Platform Plugins
 
 This repository is a Codex plugin marketplace containing a Codex-compatible Canvas Apps plugin.
 
