@@ -37,7 +37,7 @@ Then start Codex and run:
 /plugins
 ```
 
-Install **Canvas Apps for Codex** from **Justin Power Platform Plugins**.
+Install **Canvas Apps for Codex** from **Power Platform Plugins**.
 
 ## First test
 
