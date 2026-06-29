@@ -1,7 +1,7 @@
 {
-  "name": "justin-power-platform-plugins",
+  "name": "power-platform-plugins",
   "interface": {
-    "displayName": "Justin Power Platform Plugins"
+    "displayName": "Power Platform Plugins"
   },
   "plugins": [
     {
