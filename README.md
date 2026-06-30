@@ -23,23 +23,31 @@ This repository is a Codex plugin marketplace containing a Codex-compatible Canv
 
 The `.agents/plugins/marketplace.json` file tells Codex where the plugin lives inside this repo. The actual plugin is under `plugins/canvas-apps-codex/`.
 
-## Install from this GitHub repo
+## Install the plugin
 
-After pushing this repository to GitHub, add it to Codex:
+Add the published marketplace repository to Codex:
 
 ```powershell
 codex plugin marketplace add https://github.com/justdevcode/codex-power-platform-plugins.git --ref main
 ```
 
-Then start Codex and run:
+Adding the marketplace only makes the plugin available. You still need to install the plugin before its skills and MCP server are available in Codex.
+
+Start Codex and run the plugins command:
 
 ```text
 /plugins
 ```
 
-Install **Canvas Apps for Codex** from **Power Platform Plugins**.
+In the plugins view:
 
-## First test
+1. Find the **Power Platform Plugins** marketplace.
+2. Select **Canvas Apps for Codex**.
+3. Install the plugin.
+
+After installation, restart Codex if prompted.
+
+## Verify the installation
 
 After installing the plugin:
 
@@ -55,7 +63,7 @@ Then run:
 $configure-canvas-mcp
 ```
 
-Provide the Power Apps Studio URL when prompted.
+Open the target Canvas App in Power Apps Studio, then provide the Power Apps Studio URL when prompted.
 
 ## Source and attribution
 
