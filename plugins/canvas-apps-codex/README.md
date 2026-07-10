@@ -94,6 +94,17 @@ You should not need to manually add the main MCP server command to:
 
 Codex may still use `config.toml` for plugin-scoped MCP settings such as enabling or disabling the server, or setting tool approval behaviour.
 
+### Authentication and reconnection
+
+The connection uses the default authentication behavior unless an alternative is requested or a previous sign-in fails. The connect tool also supports:
+
+- `auth_flow`: `broker`, `browser`, or `devicecode`; use `devicecode` on headless or SSH hosts with an MCP client that supports elicitation
+- `login_hint`: the requested account UPN; reuse a known successful value when switching environment or app
+- `tenant_id`: the host or resource tenant GUID for Entra B2B guest access only
+- `force_account_select: true`: retry with an account picker after a cached-account 401/403 failure
+
+These values cannot be derived from the Power Apps Studio URL. Do not guess them, and omit them for normal same-tenant sign-in.
+
 ## Main skills
 
 The preferred skill is:

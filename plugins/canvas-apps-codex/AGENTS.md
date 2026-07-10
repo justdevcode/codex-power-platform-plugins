@@ -54,6 +54,8 @@ Do not define the main `canvas-authoring` transport command manually in `~/.code
 5. User runs `$canvas-app` with create or edit requirements.
 6. The skill syncs the current app state, detects CREATE or EDIT mode, plans the work, updates `.pa.yaml` files, and validates with `compile_canvas`.
 
+The connect tool supports optional `auth_flow`, `login_hint`, `tenant_id`, and `force_account_select` parameters. Use `devicecode` authentication for headless or SSH hosts, `tenant_id` only for Entra B2B guest access, and `force_account_select: true` only after a cached-account 401/403 failure. Do not guess identity or tenant values, and reuse a known `login_hint` when reconnecting to another environment or app.
+
 ## Skills
 
 | Skill | Description |

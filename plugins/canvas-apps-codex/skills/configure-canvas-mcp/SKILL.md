@@ -1,6 +1,6 @@
 ---
 name: configure-canvas-mcp
-version: 2.1.0-codex.1
+version: 2.1.1-codex.1
 description: Configure the bundled Canvas Authoring MCP server for the current Power Apps Studio coauthoring session. Use when the user says configure MCP, set up MCP server, MCP not working, connect Canvas Apps MCP, canvas-authoring not available, MCP not configured, or set up canvas apps. Do not continue if prerequisites are missing; direct the user to install .NET 10 SDK first.
 author: Microsoft Corporation / Codex adaptation
 ---
@@ -95,17 +95,19 @@ Call it with:
 
 Optional parameters:
 
-- `login_hint`: include only if the user explicitly asked to connect as a specific account or UPN.
-- `auth_flow`: include only if the user explicitly requested a specific auth flow, such as `browser` or `broker`.
+- `login_hint`: include only if the user explicitly asked to connect as a specific account or UPN. When reconnecting to switch environment or app, reuse the same `login_hint` from the previous successful connection, if known.
+- `auth_flow`: include `browser`, `broker`, or `devicecode` only if the user explicitly requested a specific flow or a previous sign-in failed. Use `devicecode` on headless or SSH hosts where browser and broker flows cannot open a UI; this requires a client that supports MCP elicitation so it can present the verification URL and user code.
+- `tenant_id`: include a tenant GUID only for Entra B2B guest access. Use the host or resource tenant where the user is a guest, together with the guest's home UPN in `login_hint`. Omit it for normal same-tenant sign-in.
+- `force_account_select`: include `true` only when a previous connection failed with a 401 or 403 and no `login_hint` was supplied, so the user can choose a different account instead of silently reusing a cached one.
 
-Do not guess `login_hint` or `auth_flow`.
+Do not proactively prompt for optional parameters. Omit them for the default connection, and never guess `login_hint`, `auth_flow`, or `tenant_id`.
 
 If the connect call fails, report the exact error and suggest checking that:
 
 1. The Studio URL is correct and the browser tab is still open.
 2. Coauthoring is enabled in the app settings.
 3. .NET 10 SDK is correctly installed.
-4. If sign-in failed, the user may need to specify `auth_flow` or `login_hint`.
+4. If sign-in failed, the user may need to specify `auth_flow` (`browser`, `broker`, or `devicecode`) or `login_hint`. On a headless or SSH host, use `devicecode`. If a cached account keeps being selected, retry with `force_account_select: true`. For Entra B2B guest access, set `tenant_id` to the host tenant.
 
 ### 4. Confirm
 

@@ -1,6 +1,6 @@
 ---
 name: generate-canvas-app
-version: 2.1.0-codex.1
+version: 2.1.1-codex.1
 description: Compatibility wrapper for older prompts. Use when the user asks to create, build, or generate a Power Apps Canvas App. Delegates to the unified canvas-app workflow in CREATE mode.
 author: Microsoft Corporation / Codex adaptation
 ---

@@ -1,6 +1,6 @@
 ---
 name: canvas-app
-version: 2.1.0-codex.1
+version: 2.1.1-codex.1
 description: Create or edit a Power Apps Canvas App through the Canvas Authoring MCP coauthoring session. Handles new app generation, simple inline edits, and complex multi-screen changes. Triggers on create, build, generate, modify, update, change, or edit requests for Canvas Apps or .pa.yaml files.
 author: Microsoft Corporation / Codex adaptation
 ---

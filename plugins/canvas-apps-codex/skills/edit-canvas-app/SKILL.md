@@ -1,6 +1,6 @@
 ---
 name: edit-canvas-app
-version: 2.1.0-codex.1
+version: 2.1.1-codex.1
 description: Compatibility wrapper for older prompts. Use when the user asks to modify, update, change, or edit an existing Power Apps Canvas App. Delegates to the unified canvas-app workflow in EDIT mode.
 author: Microsoft Corporation / Codex adaptation
 ---
