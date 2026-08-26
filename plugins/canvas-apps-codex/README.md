@@ -1,189 +1,75 @@
 # Canvas Apps for Codex
 
-A Codex-compatible Power Platform plugin for creating, editing, validating, and syncing Microsoft Power Apps Canvas Apps using natural language.
+A Codex-compatible port of Microsoft's Canvas Apps plugin for creating, editing, validating,
+and syncing Power Apps Canvas Apps through a live Power Apps Studio coauthoring session.
 
-This plugin is adapted from Microsoft's official Canvas Apps plugin in the `microsoft/power-platform-skills` repository and adjusted so it can be installed and used as an OpenAI Codex plugin.
+This release tracks Microsoft Canvas Apps plugin **v3.0.3** at commit
+[`0b9b038`](https://github.com/microsoft/power-platform-skills/commit/0b9b0389607c6c45c1dfee2714f4c12f152111f3).
 
-## What this plugin does
+## Capabilities
 
-This plugin helps Codex work with Power Apps Canvas Apps through the Canvas Authoring MCP server.
-
-It supports:
-
-- configuring Codex to connect to a Power Apps Studio coauthoring session
-- creating new Canvas Apps from natural language requirements
-- editing existing Canvas Apps
-- adding data sources through guided Power Apps Studio steps
-- planning app screens and app structure
-- writing `.pa.yaml` source files
-- validating generated Canvas App source
-- running additional Canvas App quality checks
+- Create a Canvas App from natural-language requirements.
+- Make direct targeted edits or plan complex multi-screen changes.
+- Generate and modify `.pa.yaml` files with responsive layouts and Power Fx.
+- Validate changes through `compile_canvas` and converge on clean diagnostics.
+- Guide users through adding Studio-managed data sources and connectors.
+- Inject a prompt-time reminder to sync the current coauthoring session before edits.
 
 ## Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
-- Codex CLI or Codex IDE extension with plugin support
-- Access to the target Power Platform environment
-- Access to the target Canvas App
-- Power Apps Studio coauthoring enabled where required
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
+- Codex with plugin support.
+- Access to the target Power Platform environment and Canvas App.
+- Power Apps Studio open with coauthoring enabled. Keep the Studio tab open throughout the
+  session; closing it ends the coauthoring connection.
 
-The `$configure-canvas-mcp` skill checks `.NET 10 SDK` using:
+Verify the SDK with:
 
-```bash
+```powershell
 dotnet --list-sdks
 ```
 
-If no version `10.x.y` or higher is listed, install .NET 10 SDK, restart Codex, and run the configure skill again.
+## Skills
 
-## Codex-specific changes
+| Skill | Purpose |
+|---|---|
+| `$canvas-app` | Unified create and edit workflow; automatically selects CREATE or EDIT mode |
+| `$configure-canvas-mcp` | Connect the bundled Canvas Authoring MCP server to the open Studio app |
+| `$add-data-source` | Guide a Studio data-source or connector addition and verify it |
+| `$report-issue` | Prepare a public issue safely and create it only after approval |
 
-The original Microsoft plugin was not copied as-is. This version includes Codex-specific packaging and workflow adjustments.
+The former `$generate-canvas-app` and `$edit-canvas-app` compatibility wrappers were removed in
+v3. Use `$canvas-app` for both workflows.
 
-Key changes include:
+## Connect and use
 
-- added a Codex plugin manifest at `.codex-plugin/plugin.json`
-- added bundled MCP configuration through `.mcp.json`
-- converted the MCP file to Codex's direct server-map format
-- removed the need to manually define the Canvas Authoring MCP server transport command in `~/.codex/config.toml`
-- adapted the configure workflow so the MCP server is registered by the plugin and then connected to a Power Apps Studio session
-- added compatibility entry points for `$generate-canvas-app` and `$edit-canvas-app`
-- adjusted Claude-specific workflow wording so it makes sense in Codex
+1. Open the target app in Power Apps Studio and enable coauthoring.
+2. Keep the Studio browser tab open.
+3. Run `$configure-canvas-mcp` and provide the full Studio URL.
+4. Run `$canvas-app` with the app requirements or requested changes.
 
-## Folder structure
+The plugin bundles the MCP server command through `.mcp.json`; do not duplicate that command in
+`~/.codex/config.toml`. The connect workflow supports optional `auth_flow`, `login_hint`,
+`tenant_id`, and `force_account_select` values when a user requests them or sign-in recovery
+requires them. It never derives identity or tenant values from the Studio URL.
 
-This folder is the actual Codex plugin package.
+## Codex adaptations
 
-```text
-canvas-apps-codex/
-├─ .codex-plugin/
-│  └─ plugin.json
-├─ .mcp.json
-├─ AGENTS.md
-├─ CLAUDE.md
-├─ README.md
-├─ skills/
-├─ agents/
-└─ references/
-```
+The Microsoft workflow and reference documents are retained as closely as possible. Host-specific
+changes are limited to:
 
-The parent repository may also contain:
+- `.codex-plugin/plugin.json` packaging and the existing marketplace identity.
+- Codex `$skill-name` invocation syntax and supported skill frontmatter.
+- Codex subagent dispatch, with an inline sequential fallback when subagents are unavailable.
+- Codex filesystem, planning, and user-input conventions.
+- A Codex `UserPromptSubmit` hook using `${PLUGIN_ROOT}`.
+- A direct Codex MCP server map in `.mcp.json`.
 
-```text
-.agents/plugins/marketplace.json
-```
-
-That marketplace file is not part of this plugin package itself. It tells Codex where this plugin lives inside the repo.
-
-## MCP configuration
-
-The Canvas Authoring MCP server is defined in this plugin's `.mcp.json` file.
-
-The plugin manifest points to it with:
-
-```json
-"mcpServers": "./.mcp.json"
-```
-
-This means the MCP server transport command is bundled with the plugin.
-
-You should not need to manually add the main MCP server command to:
-
-```text
-~/.codex/config.toml
-```
-
-Codex may still use `config.toml` for plugin-scoped MCP settings such as enabling or disabling the server, or setting tool approval behaviour.
-
-### Authentication and reconnection
-
-The connection uses the default authentication behavior unless an alternative is requested or a previous sign-in fails. The connect tool also supports:
-
-- `auth_flow`: `broker`, `browser`, or `devicecode`; use `devicecode` on headless or SSH hosts with an MCP client that supports elicitation
-- `login_hint`: the requested account UPN; reuse a known successful value when switching environment or app
-- `tenant_id`: the host or resource tenant GUID for Entra B2B guest access only
-- `force_account_select: true`: retry with an account picker after a cached-account 401/403 failure
-
-These values cannot be derived from the Power Apps Studio URL. Do not guess them, and omit them for normal same-tenant sign-in.
-
-## Main skills
-
-The preferred skill is:
-
-```text
-$canvas-app
-```
-
-Additional skills include:
-
-```text
-$configure-canvas-mcp
-$add-data-source
-$generate-canvas-app
-$edit-canvas-app
-$report-issue
-```
-
-`$generate-canvas-app` and `$edit-canvas-app` are compatibility wrappers. The preferred workflow is the unified `$canvas-app` skill.
-
-## Typical usage
-
-1. Open the Canvas App in Power Apps Studio.
-2. Turn on coauthoring if required.
-3. Copy the full Power Apps Studio URL.
-4. In Codex, run:
-
-```text
-$configure-canvas-mcp
-```
-
-5. Provide the Power Apps Studio URL when prompted.
-6. Confirm that the Canvas Authoring MCP server is connected.
-7. Use:
-
-```text
-$canvas-app
-```
-
-to create or edit the app.
-
-## Updating from Microsoft upstream
-
-When Microsoft updates the original Canvas Apps plugin, compare and selectively update these folders/files:
-
-```text
-AGENTS.md
-.mcp.json
-skills/
-agents/
-references/
-README.md
-```
-
-Do not blindly overwrite Codex-specific files unless intended:
-
-```text
-.codex-plugin/plugin.json
-README.md
-```
-
-Also check for Claude-specific concepts such as:
-
-```text
-Task
-AskUserQuestion
-EnterPlanMode
-ExitPlanMode
-.plugin/plugin.json
-```
-
-These usually need Codex adaptation.
+The complete v3 reference set is in `references/`: YAML syntax, controls, layouts, GridLayout,
+Power Fx, design, QA, plan templates, create/edit routing, and validation convergence.
 
 ## Attribution
 
-This plugin is adapted from Microsoft's Power Platform skills repository:
-
-```text
-https://github.com/microsoft/power-platform-skills/tree/main/plugins/canvas-apps
-```
-
-This adaptation is not an official Microsoft release and should not imply Microsoft sponsorship or endorsement.
+Adapted from [Microsoft's Power Platform skills repository](https://github.com/microsoft/power-platform-skills/tree/main/plugins/canvas-apps)
+under the MIT License. This port is independently maintained and is not an official Microsoft
+release or endorsement.

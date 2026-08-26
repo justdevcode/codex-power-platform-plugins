@@ -1,8 +1,6 @@
 ---
 name: add-data-source
-version: 1.0.0-codex.1
-description: Guide the user to add a data source, connection, or API connector to a Canvas App through Power Apps Studio, then verify it via the Canvas Authoring MCP server.
-author: Microsoft Corporation / Codex adaptation
+description: Guide the user to add a data source, connection, or API connector to a Canvas App via Power Apps Studio, then verify and continue. USE WHEN the user asks to add a data source, add a connection, add an API, add a connector, connect to SharePoint / Dataverse / SQL / Excel / OneDrive / Teams / Office 365, or any similar request to make new data available to the app. DO NOT USE WHEN the user is asking to list or describe existing data sources — call list_data_sources or list_apis directly instead.
 ---
 
 Data sources, connections, and API connectors cannot be added by the coding agent — they must be added through the Power Apps Studio interface. This skill informs the user, guides them to add the connection in their Studio session, verifies it is available via the MCP server, and then continues with any pending work.
@@ -33,7 +31,7 @@ Explain that this step requires action in their Studio session. Tell the user:
 
 ## Phase 2 — Wait for Confirmation
 
-Pause and ask the user to reply when they have completed the steps in Studio:
+Ask the user to confirm when they have completed the steps in Studio, then pause the workflow:
 
 > "Please add the data source or connection in your Power Apps Studio session. Reply here when it's ready and I'll verify the connection before continuing."
 
@@ -45,7 +43,7 @@ Once the user confirms, call the appropriate MCP tools to check that the connect
 
 - If the request was for a **data source**: call `list_data_sources`
 - If the request was for an **API / connector**: call `list_apis`
-- If the type was unclear: call both; if parallel MCP calls are unavailable, call them sequentially
+- If the type was unclear: call both in parallel
 
 Scan the results for the connection the user added:
 
@@ -56,7 +54,7 @@ Scan the results for the connection the user added:
 2. Check that their Studio session is still active (the MCP server must be connected to a live coauthoring session).
 3. Let you know when ready to try again.
 
-Wait for the user's follow-up, then re-run Phase 3.
+Wait for their follow-up, then re-run Phase 3.
 
 ## Phase 4 — Continue
 

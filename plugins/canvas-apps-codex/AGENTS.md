@@ -1,85 +1,82 @@
 # AGENTS.md — Canvas Apps for Codex
 
-This file provides guidance to Codex when working with the **canvas-apps-codex** plugin.
+This is a Codex-compatible port of Microsoft's Canvas Apps plugin. It authors `.pa.yaml` files
+through the `canvas-authoring` MCP server and a live Power Apps Studio coauthoring session.
 
-## What this plugin is
+The Studio browser tab must remain open for the entire session. Closing it ends coauthoring and
+breaks `sync_canvas` and `compile_canvas` operations.
 
-This is a Codex-compatible adaptation of Microsoft's Canvas Apps plugin from `microsoft/power-platform-skills/plugins/canvas-apps`.
-
-The plugin helps Codex author Power Apps Canvas Apps by working with `.pa.yaml` source files and the Canvas Authoring MCP server (`canvas-authoring`). The MCP server communicates with a live Power Apps Studio coauthoring session. The Power Apps Studio browser tab must remain open for the whole session; closing it can break `sync_canvas`, `compile_canvas`, and save/preview behaviour.
-
-## Codex packaging
-
-This plugin is packaged for Codex, not Claude. The plugin root contains:
+## Architecture
 
 ```text
-.codex-plugin/plugin.json       ← Codex plugin manifest
-.mcp.json                       ← Bundled Canvas Authoring MCP server config
-AGENTS.md                       ← Agent guidance for Codex
-CLAUDE.md                       ← Compatibility note pointing back to AGENTS.md
-README.md                       ← Plugin-level documentation
-references/
-  TechnicalGuide.md             ← YAML syntax, controls, layout, Power Fx conventions
-  DesignGuide.md                ← Visual and UX design guidance
-  QAChecks.md                   ← Runtime anti-pattern checks for self-QA
-  PlanTemplates.md              ← CREATE and EDIT plan structures
-agents/
-  canvas-app-planner.md         ← Planning instructions used by the canvas-app skill
-  canvas-screen-builder.md      ← Screen implementation instructions used by the canvas-app skill
-skills/
-  canvas-app/SKILL.md           ← Unified create/edit Canvas App workflow
-  configure-canvas-mcp/SKILL.md ← Connects the bundled MCP server to a Studio session
-  add-data-source/SKILL.md      ← Guides users through adding data sources in Studio
-  generate-canvas-app/SKILL.md  ← Compatibility wrapper for create requests
-  edit-canvas-app/SKILL.md      ← Compatibility wrapper for edit requests
-  report-issue/SKILL.md         ← Prepares a safe issue report
+.codex-plugin/plugin.json       Codex package metadata
+.mcp.json                       Bundled Canvas Authoring MCP server
+hooks/hooks.json                Codex UserPromptSubmit registration
+hooks/inject-sync-reminder.cs   Advisory sync reminder
+skills/                         User-facing Codex skills
+agents/                         Planner and screen-builder instruction sources
+references/                     Microsoft v3 authoring and validation guidance
 ```
 
-## MCP configuration
-
-The Canvas Authoring MCP server is bundled through `.mcp.json`, and `.codex-plugin/plugin.json` points to it with:
-
-```json
-"mcpServers": "./.mcp.json"
-```
-
-Do not define the main `canvas-authoring` transport command manually in `~/.codex/config.toml` for this plugin. Codex may still use `config.toml` for plugin-scoped MCP enablement and tool approval policy.
-
-## Main workflow
-
-1. User opens the target Canvas App in Power Apps Studio.
-2. User enables coauthoring if required and keeps the Studio tab open.
-3. User runs `$configure-canvas-mcp`.
-4. The skill verifies `.NET 10 SDK`, extracts environment/app details from the Studio URL, and calls the `canvas-authoring` MCP connect tool.
-5. User runs `$canvas-app` with create or edit requirements.
-6. The skill syncs the current app state, detects CREATE or EDIT mode, plans the work, updates `.pa.yaml` files, and validates with `compile_canvas`.
-
-The connect tool supports optional `auth_flow`, `login_hint`, `tenant_id`, and `force_account_select` parameters. Use `devicecode` authentication for headless or SSH hosts, `tenant_id` only for Entra B2B guest access, and `force_account_select: true` only after a cached-account 401/403 failure. Do not guess identity or tenant values, and reuse a known `login_hint` when reconnecting to another environment or app.
+The reference set contains `YamlSyntax`, `ControlGuide`, `LayoutGuide`, `GridLayoutGuide`,
+`PowerFxGuide`, `DesignGuide`, `QAChecks`, `PlanTemplates`, `CreateWorkflow`, `EditWorkflow`, and
+`ValidationWorkflow`.
 
 ## Skills
 
 | Skill | Description |
 |---|---|
-| `$canvas-app` | Preferred unified workflow for create and edit requests |
-| `$configure-canvas-mcp` | Connects the bundled Canvas Authoring MCP server to the current Studio session |
-| `$add-data-source` | Guides the user to add a data source or connector in Power Apps Studio |
-| `$generate-canvas-app` | Compatibility wrapper that routes to `$canvas-app` in CREATE mode |
-| `$edit-canvas-app` | Compatibility wrapper that routes to `$canvas-app` in EDIT mode |
-| `$report-issue` | Creates a safe, reviewable issue report draft |
+| `$canvas-app` | Create or edit a Canvas App and automatically select the correct workflow |
+| `$configure-canvas-mcp` | Connect the bundled MCP server to the current Studio session |
+| `$add-data-source` | Guide a Studio-managed connection and verify it through MCP |
+| `$report-issue` | Prepare a safe public issue and require approval before submission |
+
+`$generate-canvas-app` and `$edit-canvas-app` no longer exist. Use `$canvas-app` for both modes.
+
+## Specialist instructions
+
+The unified skill may spawn Codex subagents that follow:
+
+- `agents/canvas-app-planner.md` for discovery, planning artifacts, and CREATE-mode `App.pa.yaml`.
+- `agents/canvas-screen-builder.md` for one screen file and its complete named QA pass.
+
+Run builders in parallel waves of no more than three. If subagents are unavailable, follow the
+same instruction files inline and process screen briefs sequentially. The orchestrator owns
+compilation and EDIT-mode `App.pa.yaml` changes.
+
+## MCP tools
+
+The `canvas-authoring` server provides `connect`, `sync_canvas`, `compile_canvas`, `list_controls`,
+`describe_control`, `list_apis`, `describe_api`, `list_data_sources`, and
+`get_data_source_schema`.
+
+Call `connect` before other tools. Call `sync_canvas` against the app's absolute working directory
+before reading or changing source. Never edit `_EditorState.pa.yaml` except when the approved v3
+workflow explicitly applies final order changes.
 
 ## Codex adaptation rules
 
-The Microsoft upstream instructions include some Claude-specific concepts such as `AskUserQuestion`, `EnterPlanMode`, `ExitPlanMode`, and `Task`. In this Codex adaptation:
+- Use `$skill-name`, not Claude or Copilot slash-command syntax.
+- Use Codex subagents for planner/builder dispatch and Codex progress tracking when available.
+- Ask the user directly when approval or free-form information is required.
+- Use filesystem inspection and `apply_patch` for source changes.
+- Resolve `${PLUGIN_ROOT}` to this plugin directory if the host has not already expanded it.
+- Do not copy `.plugin`, `.claude-plugin`, Copilot hook files, or unsupported skill frontmatter
+  from upstream.
+- Preserve `.codex-plugin/plugin.json`, the direct Codex `.mcp.json` map, and the repository's
+  marketplace identity during future upstream syncs.
 
-- Ask the user directly in chat when input or approval is required.
-- Present a markdown plan and wait for explicit approval instead of using plan-mode tools.
-- Use Codex subagent support if available. If not available, read the files in `agents/` and execute those instructions inline.
-- Build screens sequentially if Codex cannot run subagents in parallel.
-- Use `${PLUGIN_ROOT}` where Codex exposes it. If unavailable, resolve the plugin root as the directory containing `.codex-plugin/plugin.json`.
+## Quality invariants
 
-## Safety and quality
+- Never guess control properties or enum names; use `describe_control`.
+- Control names must be unique across the entire app.
+- Never add a version suffix to a `Control:` value.
+- Compile early, after builder waves, and after targeted repairs.
+- Do not rebuild completed screens to address ordinary compile diagnostics; repair them in place.
+- Do not report completion until compilation is clean or remaining diagnostics are explicit.
 
-- Do not guess Power Apps control properties. Use `describe_control` output and the reference docs.
-- Do not ignore `compile_canvas` failures. Fix and re-run until clean, or clearly report remaining errors.
-- Do not ask the user to add sensitive data to public issue reports.
-- Validate in a test app before using the plugin against important production apps.
+## Upstream baseline
+
+This release tracks Microsoft Canvas Apps plugin v3.0.3 at commit
+`0b9b0389607c6c45c1dfee2714f4c12f152111f3`. Microsoft workflow behavior is the source of truth;
+the adaptations above take precedence where host packaging or tool names differ.

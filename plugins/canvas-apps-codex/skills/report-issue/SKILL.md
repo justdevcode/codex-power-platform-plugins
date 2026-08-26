@@ -1,18 +1,10 @@
 ---
 name: report-issue
-version: 2.1.1-codex.1
-description: Prepare a safe issue report for the Canvas Apps Codex plugin. Use when the user wants to report a bug, file an issue, submit a bug report, or report a problem with this plugin.
-author: Microsoft Corporation / Codex adaptation
+description: >
+  Use this skill when the user wants to "report a bug", "file an issue",
+  "report an issue", "submit a bug report", or report any problem
+  with the Canvas Apps Codex plugin. Prepares a public GitHub issue safely and
+  requires approval before creating it.
 ---
 
-# Report an Issue
-
-Prepare a safe, reviewable issue report for the Canvas Apps Codex plugin.
-
-Do not submit anything publicly until the user explicitly confirms where the issue should be filed.
-
-Read and follow:
-
-```text
-report-issue-workflow.md
-```
+**Workflow: [report-issue-workflow.md](${PLUGIN_ROOT}/skills/report-issue/report-issue-workflow.md)** — Read and follow all phases defined in that bundled file.

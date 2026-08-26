@@ -1,6 +1,6 @@
 {
   "name": "canvas-apps-codex",
-  "version": "2.1.1-codex.1",
+  "version": "3.0.3-codex.1",
   "description": "Create, edit, validate, and sync Power Apps Canvas Apps using Codex and the Canvas Authoring MCP server.",
   "author": {
     "name": "Justin de Vantier",
@@ -35,8 +35,7 @@
     "defaultPrompt": [
       "Configure the Canvas Authoring MCP server for my open Power Apps Studio app.",
       "Create a simple Canvas App from requirements.",
-      "Edit the current Canvas App using the live coauthoring session.",
-      "List available Canvas App controls."
+      "Edit the current Canvas App using the live coauthoring session."
     ],
     "brandColor": "#0078D4"
   }

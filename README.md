@@ -1,82 +1,54 @@
 # Codex Power Platform Plugins
 
-This repository is a Codex plugin marketplace containing a Codex-compatible Canvas Apps plugin.
+A Codex plugin marketplace for Power Platform development workflows.
 
-## Structure
+## Available plugin
 
-```text
-.
-├─ .agents/
-│  └─ plugins/
-│     └─ marketplace.json
-└─ plugins/
-   └─ canvas-apps-codex/
-      ├─ .codex-plugin/
-      │  └─ plugin.json
-      ├─ .mcp.json
-      ├─ AGENTS.md
-      ├─ README.md
-      ├─ skills/
-      ├─ agents/
-      └─ references/
-```
+### Canvas Apps for Codex
 
-The `.agents/plugins/marketplace.json` file tells Codex where the plugin lives inside this repo. The actual plugin is under `plugins/canvas-apps-codex/`.
+`plugins/canvas-apps-codex` creates and edits Power Apps Canvas Apps through the Canvas Authoring
+MCP server and a live Power Apps Studio coauthoring session.
 
-## Install the plugin
+The current package is `3.0.3-codex.1`, based on Microsoft Canvas Apps plugin v3.0.3 at commit
+[`0b9b038`](https://github.com/microsoft/power-platform-skills/commit/0b9b0389607c6c45c1dfee2714f4c12f152111f3).
 
-Add the published marketplace repository to Codex:
+Its supported skill entrypoints are:
+
+- `$canvas-app`
+- `$configure-canvas-mcp`
+- `$add-data-source`
+- `$report-issue`
+
+## Install
+
+Add this repository as a marketplace:
 
 ```powershell
 codex plugin marketplace add https://github.com/justdevcode/codex-power-platform-plugins.git --ref main
 ```
 
-Adding the marketplace only makes the plugin available. You still need to install the plugin before its skills and MCP server are available in Codex.
+Start Codex, open `/plugins`, select **Power Platform Plugins**, and install
+**Canvas Apps for Codex**. Restart Codex when prompted.
 
-Start Codex and run the plugins command:
+After installation, open `/mcp` and confirm that `canvas-authoring` is listed. Then open the target
+Canvas App in Power Apps Studio, keep its coauthoring tab open, and run `$configure-canvas-mcp`.
 
-```text
-/plugins
-```
-
-In the plugins view:
-
-1. Find the **Power Platform Plugins** marketplace.
-2. Select **Canvas Apps for Codex**.
-3. Install the plugin.
-
-After installation, restart Codex if prompted.
-
-## Verify the installation
-
-After installing the plugin:
+## Repository structure
 
 ```text
-/mcp
+.agents/plugins/marketplace.json       Marketplace definition
+plugins/canvas-apps-codex/             Codex plugin package
+  .codex-plugin/plugin.json            Package manifest
+  .mcp.json                            Canvas Authoring server registration
+  hooks/                               Prompt-time sync reminder
+  skills/                              User-facing workflows
+  agents/                              Planner and screen-builder instructions
+  references/                          Microsoft v3 authoring guidance
 ```
 
-Confirm `canvas-authoring` is listed.
+## Attribution
 
-Then run:
-
-```text
-$configure-canvas-mcp
-```
-
-Open the target Canvas App in Power Apps Studio, then provide the Power Apps Studio URL when prompted.
-
-## Source and attribution
-
-The plugin is adapted from Microsoft's Power Platform skills repository:
-
-```text
-https://github.com/microsoft/power-platform-skills/tree/main/plugins/canvas-apps
-```
-
-It also references the earlier Codex port by Ratnam Mishra:
-
-```text
-https://github.com/Ratnam-Mishra/canvas-apps-plugin-codex
-```
-
-This repository is not an official Microsoft release.
+The Canvas Apps plugin is adapted from
+[Microsoft's Power Platform skills repository](https://github.com/microsoft/power-platform-skills/tree/main/plugins/canvas-apps)
+and retains Microsoft-authored workflow and reference material under the MIT License. This
+repository is independently maintained and is not an official Microsoft release.

@@ -1,93 +1,67 @@
 # Report Issue
 
-File a bug report on the appropriate GitHub repository. This workflow gathers the required information, presents a full preview, and prepares the issue and creates it only after explicit user confirmation.
+Prepare and, only after explicit approval, file a public GitHub issue for the Canvas Apps
+Codex plugin or its Microsoft upstream workflow.
 
 **Initial request:** $ARGUMENTS
 
-> **WARNING:** Before proceeding, inform the user: "This may become a public GitHub issue. Do not include credentials, internal URLs, tenant IDs, customer data, proprietary code, or any other sensitive information."
+Before gathering details, warn the user that the issue will be public. Do not include
+credentials, internal URLs, tenant or environment IDs, customer data, proprietary code,
+access tokens, or other sensitive information.
 
----
+## 1. Identify the Package and Destination
 
-## Phase 1: Identify Plugin & Version
+Read `${PLUGIN_ROOT}/.codex-plugin/plugin.json` and record its `name` and `version`.
 
-**Goal**: Determine which plugin the bug is for and its version.
+Choose the issue destination from the reported problem:
 
-**Actions**:
+- Codex packaging, installation, hooks, marketplace behavior, or a Codex-only adaptation:
+  `justdevcode/codex-power-platform-plugins`.
+- Behavior reproduced in the unmodified Microsoft Canvas Apps workflow or its shared reference
+  guidance: `microsoft/power-platform-skills` with plugin name `canvas-apps`.
+- If the cause is unclear, default to the JustDev repository and state that maintainers can
+  upstream it after triage.
 
-1. Create a short markdown checklist with all 5 phases (see [Progress Tracking](#progress-tracking) table).
-2. **Auto-detect the plugin name** from the current plugin context by reading `${PLUGIN_ROOT}/.codex-plugin/plugin.json`. Extract the `name` field.
-3. **Auto-detect the plugin version** from `.codex-plugin/plugin.json` — extract the `version` field.
-4. If the plugin name or version cannot be determined, ask the user directly the user.
+Tell the user which public repository will receive the issue before requesting approval.
 
-**Output**: Plugin name and version confirmed.
+## 2. Gather Details
 
----
+Extract everything already supplied in `$ARGUMENTS`, then ask only for missing information:
 
-## Phase 2: Gather Bug Details
+1. Skill or command being used.
+2. Concise bug description.
+3. Steps to reproduce.
+4. Expected behavior.
+5. Actual behavior.
+6. Optional logs or screenshots.
 
-**Goal**: Collect all required and optional fields for the bug report.
+Ask whether the user wants environment details collected before running any environment command.
+If approved, collect only:
 
-**Actions**:
+- OS name and version.
+- `codex --version`.
+- `pac help` version information, when PAC CLI is relevant and installed.
+- Plugin package name and version from the manifest.
 
-### 2.1 Check Arguments
+If a command is unavailable, record `not installed` rather than installing anything. Redact
+sensitive values from collected output and ask the user to review it.
 
-If `$ARGUMENTS` contains a description of the bug, extract as much information as possible from it to pre-fill the fields below. Still confirm with the user.
+Use `update_plan` for progress tracking when it is available. Otherwise keep the workflow state
+in the conversation; do not require a separate task tool.
 
-### 2.2 Ask for Bug Details
+## 3. Preview
 
-Ask the user directly for the bug details. Keep the questions concise and skip any field the user already provided in `$ARGUMENTS`.
+Show the complete issue exactly as it will be filed:
 
-**Ask** — Skill and bug description (2 questions):
-
-1. **"Which skill or command were you using?"** (header: "Skill") — Provide the plugin's known skills as options (e.g., `deploy-site`, `create-site`). This is optional — the user can skip it.
-2. **"Please describe the bug clearly and concisely."** (header: "Bug") — Provide short prompt-hint options like "Skill failed with error", "Unexpected behavior", "Skill hangs or times out". The user will typically select "Other" to type their description.
-
-**Ask** — Repro steps and expected vs actual (3 questions):
-
-1. **"What steps reproduce the bug?"** (header: "Repro steps") — Provide prompt-hint options like "Ran the skill with default settings", "Ran the skill with custom arguments". The user will typically select "Other" to type their steps.
-2. **"What did you expect to happen?"** (header: "Expected") — Provide prompt-hint options like "Skill should have succeeded", "Different output expected". The user will typically select "Other" to type their answer.
-3. **"What actually happened?"** (header: "Actual") — Provide prompt-hint options like "Got an error message", "Wrong output produced", "Skill hung or timed out". The user will typically select "Other" to type their answer.
-
-**Ask** — Environment details:
-
-Ask the user with a single question: **"We recommend including environment details (OS, Codex CLI/IDE extension version, PAC CLI version) to help maintainers reproduce and debug the issue faster. Include them?"** (header: "Environment") — Options: "Yes, auto-collect them" (recommended), "No, skip".
-
-- If **yes**: Auto-collect the following by running shell commands:
-  - **OS**: Detect the user's OS name and version using an appropriate command for their platform.
-  - **Codex CLI/IDE extension version**: Run `claude --version`
-  - **PAC CLI version**: Run `pac help` and extract the version from the output
-  - Present the collected details to the user.
-- If **no**: Skip environment fields.
-
-**Call 4** — Logs:
-
-Ask the user with a single question: **"Do you want to include any relevant logs or error messages?"** (header: "Logs") — Options: "Yes, I'll paste them", "No, skip".
-
-- If **yes**: Ask the user to ask: **"Please paste any relevant logs or error messages."** (header: "Paste logs") — Provide prompt-hint options like "Error message from terminal", "Skill output log". The user will typically select "Other" to paste their content.
-- If **no**: Skip this field.
-
-**Output**: All bug report fields gathered.
-
----
-
-## Phase 3: Preview Issue
-
-**Goal**: Present the complete issue to the user for review before creating it.
-
-**Actions**:
-
-Remind the user: **"This issue will be created on the public GitHub repository. Please review and make sure it does not contain any sensitive information (credentials, internal URLs, tenant IDs, customer data, or proprietary code)."**
-
-Format and display the full issue exactly as it will be filed:
-
-```
+```text
 ===== ISSUE PREVIEW =====
 
+Repository: <owner/repository>
 Title: [Bug] <short summary>
 
-Plugin: <plugin-name>
-Plugin Version: <version>
-Skill / Command: <skill or "N/A">
+Plugin: <canvas-apps-codex or canvas-apps>
+Codex Package Version: <version>
+Skill / Command: <skill or N/A>
 
 Bug Description:
 <description>
@@ -102,129 +76,37 @@ Actual Behavior:
 <actual>
 
 Relevant Logs / Screenshots:
-<logs or "None">
+<logs or None>
 
 Environment:
-<environment details or "None">
+<environment details or None>
 
-Labels: bug, <plugin-name>
+Labels: bug
 
 ---
-🤖 This issue was created using the /report-issue skill.
+This issue was prepared using the $report-issue skill.
 
 ===== END PREVIEW =====
 ```
 
-Ask the user to confirm:
+Remind the user that the destination is public and ask for explicit approval. If they request
+changes, update the preview and ask again. Do not create the issue without approval.
 
-> "Here's the issue that will be created. Would you like to proceed, or would you like to make any changes?"
+## 4. Create the Issue
 
-- If the user wants changes, go back and update the relevant fields, then preview again.
-- If the user approves, proceed to Phase 4.
+After approval, verify that `gh` is installed and authenticated. Create the issue with
+`gh issue create` against the approved repository. Use a temporary body file or another safe
+argument mechanism that preserves formatting; do not interpolate untrusted issue text into an
+executable shell command.
 
-**Output**: User-approved issue ready for creation.
+Apply only the `bug` label unless another label has been verified to exist in the destination
+repository. Capture and display the created issue URL.
 
----
+If authentication, permissions, validation, or network access fails, do not retry indefinitely.
+Report the exact failure and leave the approved title and body ready for the user to submit
+manually.
 
-## Phase 4: Create Issue
+## 5. Finish
 
-**Goal**: Create the GitHub issue using the `gh` CLI.
-
-**Actions**:
-
-1. Build the issue body from the gathered fields, matching the bug report template structure:
-
-   ```
-   ### Plugin
-
-   <plugin-name>
-
-   ### Plugin Version
-
-   <version>
-
-   ### Skill / Command
-
-   <skill or empty>
-
-   ### Bug Description
-
-   <description>
-
-   ### Steps to Reproduce
-
-   <steps>
-
-   ### Expected Behavior
-
-   <expected>
-
-   ### Actual Behavior
-
-   <actual>
-
-   ### Relevant Logs / Screenshots
-
-   <logs or "None">
-
-   ### Environment
-
-   <environment details or "None">
-
-   ---
-   🤖 *This issue was created using the `/report-issue` skill.*
-   ```
-
-2. Create the issue via `gh`:
-
-   ```bash
-   gh issue create --repo microsoft/power-platform-skills --title "[Bug] <short summary>" --label "bug" --label "<plugin-name>" --body "<body>"
-   ```
-
-   Use a HEREDOC for the body to preserve formatting.
-
-3. Capture and display the issue URL to the user.
-
-**Output**: Issue created, URL shared with user.
-
----
-
-## Phase 5: Summarize
-
-**Goal**: Confirm success and suggest next steps.
-
-**Actions**:
-
-1. Display the created issue URL.
-2. Let the user know they can track the issue on GitHub.
-
-**Output**: Issue URL and next steps presented.
-
----
-
-## Important Notes
-
-### Throughout All Phases
-
-- **Use checklist item/checklist update** to track progress at every phase.
-- **Always ask the user directly** before collecting any environment information — never run commands to gather system details without explicit user consent.
-- **Always preview the full issue** before creating it — the user must approve the content.
-- **Use the `gh` CLI** to create the issue — confirm it is authenticated before attempting.
-
-### Progress Tracking
-
-Before starting Phase 1, create a task list with all phases using `checklist item`:
-
-| Task subject | activeForm | Description |
-|-------------|------------|-------------|
-| Identify plugin and version | Identifying plugin | Auto-detect plugin name and version from plugin.json |
-| Gather bug details | Gathering details | Collect bug description, repro steps, expected/actual behavior |
-| Preview issue | Previewing issue | Show complete issue for user review and approval |
-| Create issue | Creating issue | File the bug report on GitHub via gh CLI |
-| Summarize | Summarizing | Confirm success and share issue URL |
-
-Mark each task `in_progress` when starting it and `completed` when done via `checklist update`.
-
----
-
-**Begin with Phase 1: Identify Plugin & Version**
+Return the issue URL when creation succeeds. Otherwise return the final approved issue content and
+the destination repository. Never claim an issue was created unless `gh` returned its URL.
