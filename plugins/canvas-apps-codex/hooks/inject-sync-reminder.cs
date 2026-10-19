@@ -10,10 +10,12 @@ using System.Text.Json;
 const string Reminder =
     "Canvas Apps coauthoring reminder: " +
     "Before acting on this request, if a Canvas Authoring session is " +
-    "active (i.e. `connect` has already been called for a canvas app), first call " +
-    "the `sync_canvas` MCP tool targeting the app's working directory to pull the " +
-    "current session state into the local .pa.yaml files. This avoids editing stale " +
-    "YAML. If no coauthoring session is active yet, or this request is unrelated to " +
+    "active (i.e. `connect` has already been called for a canvas app), follow the " +
+    "installed plugin's references/CodexRuntime.md snapshot reconciliation procedure. " +
+    "Sync into a fresh external snapshot, never over the app working directory; " +
+    "preserve local drafts and planning artifacts and resolve conflicts before editing. " +
+    "Wait for active writers before reconciliation. If no coauthoring session is active " +
+    "yet, or this request is unrelated to " +
     "a canvas app, skip the sync.";
 
 try
@@ -33,8 +35,8 @@ try
     }
     catch (JsonException)
     {
-        // Hook failures must not block the user's prompt. If parsing fails, emit the
-        // Codex UserPromptSubmit hooks accept the additional-context shape.
+        // Hook failures must not block the user's prompt. If parsing fails, emit
+        // the Codex UserPromptSubmit additional-context shape.
     }
 
     using var writer = new Utf8JsonWriter(Console.OpenStandardOutput());

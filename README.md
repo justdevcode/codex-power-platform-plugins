@@ -9,8 +9,13 @@ A Codex plugin marketplace for Power Platform development workflows.
 `plugins/canvas-apps-codex` creates and edits Power Apps Canvas Apps through the Canvas Authoring
 MCP server and a live Power Apps Studio coauthoring session.
 
-The current package is `3.0.3-codex.1`, based on Microsoft Canvas Apps plugin v3.0.3 at commit
-[`0b9b038`](https://github.com/microsoft/power-platform-skills/commit/0b9b0389607c6c45c1dfee2714f4c12f152111f3).
+The package is prepared for release as `3.1.0-codex.1`, based on Microsoft Canvas Apps
+plugin v3.1.0 at the incorporated source snapshot
+[`8a10052386a56376bb47162a0e2094d727164b94`](https://github.com/microsoft/power-platform-skills/commit/8a10052386a56376bb47162a0e2094d727164b94).
+
+**Validation:** repository static validation passed. **Live Power Apps Studio testing
+was skipped.** Fresh Codex installation and rendered/runtime behavior have not been
+verified. See [validation details and limitations](plugins/canvas-apps-codex/README.md#validation).
 
 Its supported skill entrypoints are:
 

@@ -3,17 +3,21 @@
 A Codex-compatible port of Microsoft's Canvas Apps plugin for creating, editing, validating,
 and syncing Power Apps Canvas Apps through a live Power Apps Studio coauthoring session.
 
-This release tracks Microsoft Canvas Apps plugin **v3.0.3** at commit
-[`0b9b038`](https://github.com/microsoft/power-platform-skills/commit/0b9b0389607c6c45c1dfee2714f4c12f152111f3).
+Prepared for release as **3.1.0-codex.1**, adapting Microsoft Canvas Apps plugin
+**v3.1.0** at the incorporated source snapshot
+[`8a10052386a56376bb47162a0e2094d727164b94`](https://github.com/microsoft/power-platform-skills/commit/8a10052386a56376bb47162a0e2094d727164b94).
+
+**Repository static validation passed; live Power Apps Studio testing was skipped.**
+See [validation](#validation) for coverage and remaining limitations.
 
 ## Capabilities
 
-- Create a Canvas App from natural-language requirements.
-- Make direct targeted edits or plan complex multi-screen changes.
+- Create an app through functionality, screens, composition, feasibility and implementation stages.
+- Assess edits as Direct, sequential Partitioned, or Planned; preserve unaffected behavior.
 - Generate and modify `.pa.yaml` files with responsive layouts and Power Fx.
 - Validate changes through `compile_canvas` and converge on clean diagnostics.
 - Guide users through adding Studio-managed data sources and connectors.
-- Inject a prompt-time reminder to sync the current coauthoring session before edits.
+- Reconcile Studio snapshots with local drafts before edits; retain planning artifacts.
 
 ## Prerequisites
 
@@ -53,6 +57,11 @@ The plugin bundles the MCP server command through `.mcp.json`; do not duplicate 
 `tenant_id`, and `force_account_select` values when a user requests them or sign-in recovery
 requires them. It never derives identity or tenant values from the Studio URL.
 
+The MCP launch now selects the stable package channel. Optional server tools are detected
+from their actual schemas. Missing stock-image search does not prevent using existing or
+user-provided assets; essential missing imagery remains an explicit feasibility gap.
+Diagnostic operations are optional EDIT evidence, not proof of runtime behavior.
+
 ## Codex adaptations
 
 The Microsoft workflow and reference documents are retained as closely as possible. Host-specific
@@ -62,11 +71,39 @@ changes are limited to:
 - Codex `$skill-name` invocation syntax and supported skill frontmatter.
 - Codex subagent dispatch, with an inline sequential fallback when subagents are unavailable.
 - Codex filesystem, planning, and user-input conventions.
-- A Codex `UserPromptSubmit` hook using `${PLUGIN_ROOT}`.
-- A direct Codex MCP server map in `.mcp.json`.
+- A Codex `UserPromptSubmit` hook using `${PLUGIN_ROOT}`, retaining its output protocol and
+  registration while reminding the coordinator to reconcile an external snapshot.
+- A Codex MCP server map under the supported `mcpServers` wrapper in `.mcp.json`.
 
-The complete v3 reference set is in `references/`: YAML syntax, controls, layouts, GridLayout,
-Power Fx, design, QA, plan templates, create/edit routing, and validation convergence.
+The reference set includes 29 upstream v3.1.0 documents plus `references/CodexRuntime.md`.
+CREATE has five specialist roles; EDIT has a planner and screen builder. The coordinator
+owns shared YAML and compilation. See CodexRuntime for tool contracts, sequential fallback,
+workspace reconciliation and control-version preservation. Installed hooks require host
+trust; a missing or untrusted reminder does not remove the skill's synchronization rules.
+
+## Validation
+
+For this release preparation, `node scripts/validate-canvas-plugin.cjs` and
+`git diff --check` passed. The repository validator checks JSON, package and marketplace
+identity, the wrapped MCP map, hook registration, four skill entrypoints, seven specialist
+frontmatters, 173 concrete plugin references, Markdown fences and 44 ordered QA checks.
+Frontmatter validation covers the package's restricted YAML subset, not general YAML.
+
+During the upgrade, the hook compiled with zero warnings/errors and passed five isolated
+input/output checks. The cached stable MCP package 1.1.29 exposed the inspected schemas
+and passed five pure assessment cases without connecting to Studio. These checks do not
+prove fresh installation or live app behavior.
+
+**Live Power Apps Studio testing was skipped.** App compilation/application, snapshot
+reconciliation, real control metadata, diagnostic responses, rendering, navigation,
+mutations, accessibility and persistence remain unverified in a live session. Installed
+Codex hook activation and specialist tool access were also not tested.
+
+The official Python validators could not run because Python was unavailable. The bundled
+plugin validator checks the supported `mcpServers` wrapper; fresh target-host ingestion
+remains unverified. Stock-image search was absent from the inspected server, so workflows
+use existing/user-provided assets or report an essential-asset blocker. No equivalence with
+unavailable upstream tool names is assumed.
 
 ## Attribution
 

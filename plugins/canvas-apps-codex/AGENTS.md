@@ -1,82 +1,71 @@
 # AGENTS.md — Canvas Apps for Codex
 
-This is a Codex-compatible port of Microsoft's Canvas Apps plugin. It authors `.pa.yaml` files
-through the `canvas-authoring` MCP server and a live Power Apps Studio coauthoring session.
+This plugin authors Power Apps Canvas Apps through a live Studio coauthoring session.
+Keep the Studio tab open. Read references/CodexRuntime.md before app work; it owns host
+capability checks, snapshot reconciliation, Codex dispatch and authorization conventions.
 
-The Studio browser tab must remain open for the entire session. Closing it ends coauthoring and
-breaks `sync_canvas` and `compile_canvas` operations.
+## Architecture and entrypoints
 
-## Architecture
+Preserve .codex-plugin/plugin.json, the wrapped Codex .mcp.json server map, marketplace
+identity, hooks/hooks.json registration, and the four supported skills:
 
-```text
-.codex-plugin/plugin.json       Codex package metadata
-.mcp.json                       Bundled Canvas Authoring MCP server
-hooks/hooks.json                Codex UserPromptSubmit registration
-hooks/inject-sync-reminder.cs   Advisory sync reminder
-skills/                         User-facing Codex skills
-agents/                         Planner and screen-builder instruction sources
-references/                     Microsoft v3 authoring and validation guidance
-```
+- $canvas-app: staged CREATE and Direct / Partitioned / Planned EDIT.
+- $configure-canvas-mcp: connect to the open Studio session.
+- $add-data-source: guide Studio-managed connection changes and verify them.
+- $report-issue: preview an issue, choose the correct repository and obtain submission approval.
 
-The reference set contains `YamlSyntax`, `ControlGuide`, `LayoutGuide`, `GridLayoutGuide`,
-`PowerFxGuide`, `DesignGuide`, `QAChecks`, `PlanTemplates`, `CreateWorkflow`, `EditWorkflow`, and
-`ValidationWorkflow`.
+The former generate/edit compatibility wrappers remain removed. Do not import upstream
+.plugin, .claude-plugin, root Copilot hooks or host-specific skill frontmatter.
 
-## Skills
+## Specialists and references
 
-| Skill | Description |
-|---|---|
-| `$canvas-app` | Create or edit a Canvas App and automatically select the correct workflow |
-| `$configure-canvas-mcp` | Connect the bundled MCP server to the current Studio session |
-| `$add-data-source` | Guide a Studio-managed connection and verify it through MCP |
-| `$report-issue` | Prepare a safe public issue and require approval before submission |
+CREATE uses canvas-create-functionality, canvas-create-screens, canvas-create-layout,
+canvas-create-discovery and canvas-create-builder. The first four run sequentially.
+EDIT planning uses canvas-app-planner; Planned EDIT screens use canvas-screen-builder.
+These agents/*.md files are instruction sources supplied explicitly to Codex spawn_agent,
+not registered agent types. Keep each role's context and output ownership bounded.
+Use at most three concurrent builders, subject to host capacity; join the whole wave
+before compiling. If delegation or worker tools are unavailable, execute the same roles
+inline and sequentially. Partitioned EDIT is sequential in the coordinator.
 
-`$generate-canvas-app` and `$edit-canvas-app` no longer exist. Use `$canvas-app` for both modes.
+References are loaded on demand. CreateWorkflow routes to experience stages,
+CreateImplementation, CreateBuilderCore, topic modules and CreateValidation. EditWorkflow
+routes to EditConformance, PlanModel and its artifact documents, PlannedEditHandoff and
+ValidationWorkflow. BehaviorCore, MutationBehavior, DataBehavior and the control/layout/
+Power Fx/YAML guides provide scoped rules. QAChecks has 44 checks; CREATE uses its own
+conformance routing rather than loading all legacy checks. PlanTemplates is retired.
 
-## Specialist instructions
+## Ownership and synchronization
 
-The unified skill may spawn Codex subagents that follow:
+Call connect before app operations. Inspect actual tool schemas; do not invent missing
+operations or equate similar names. Optional diagnostics/imagery and assessment fallback
+are defined in CodexRuntime. The coordinator owns App.pa.yaml, _EditorState.pa.yaml,
+shared contracts, synchronization and compilation. Builders own one screen; the EDIT
+planner writes only plans and never compiles or writes app YAML.
 
-- `agents/canvas-app-planner.md` for discovery, planning artifacts, and CREATE-mode `App.pa.yaml`.
-- `agents/canvas-screen-builder.md` for one screen file and its complete named QA pass.
+Synchronize only into fresh external snapshots. Reconcile current working YAML against
+the retained server baseline and new snapshot, preserving local drafts and Markdown.
+Resolve conflicts before editing; no hook or specialist may overwrite the working copy.
+Use a separate snapshot for final server verification. Never derive the immutable plugin
+root from the app workspace, and never synchronize into the installed plugin.
 
-Run builders in parallel waves of no more than three. If subagents are unavailable, follow the
-same instruction files inline and process screen briefs sequentially. The orchestrator owns
-compilation and EDIT-mode `App.pa.yaml` changes.
+## Quality and preservation
 
-## MCP tools
+- Describe selected controls directly; copy complete creation keywords for new instances.
+- Preserve existing names, versions, bindings, layout and feedback outside the approved delta.
+- Never independently add or strip a version suffix, or migrate preserved controls merely
+  because current metadata differs. Reconcile incompatible contracts explicitly.
+- New control names are app-wide unique. Use exact returned enums and supported properties.
+- Compile shared initialization, after builder waves and after targeted repairs.
+- Repair existing screens in place; do not regenerate them for compiler diagnostics.
+- Complete all workers and evidence before final compilation. Distinguish static checks,
+  compile results, server-state verification and actual rendered/runtime tests.
+- Keep Codex issue routing and explicit public-submission approval intact.
 
-The `canvas-authoring` server provides `connect`, `sync_canvas`, `compile_canvas`, `list_controls`,
-`describe_control`, `list_apis`, `describe_api`, `list_data_sources`, and
-`get_data_source_schema`.
+## Release baseline
 
-Call `connect` before other tools. Call `sync_canvas` against the app's absolute working directory
-before reading or changing source. Never edit `_EditorState.pa.yaml` except when the approved v3
-workflow explicitly applies final order changes.
-
-## Codex adaptation rules
-
-- Use `$skill-name`, not Claude or Copilot slash-command syntax.
-- Use Codex subagents for planner/builder dispatch and Codex progress tracking when available.
-- Ask the user directly when approval or free-form information is required.
-- Use filesystem inspection and `apply_patch` for source changes.
-- Resolve `${PLUGIN_ROOT}` to this plugin directory if the host has not already expanded it.
-- Do not copy `.plugin`, `.claude-plugin`, Copilot hook files, or unsupported skill frontmatter
-  from upstream.
-- Preserve `.codex-plugin/plugin.json`, the direct Codex `.mcp.json` map, and the repository's
-  marketplace identity during future upstream syncs.
-
-## Quality invariants
-
-- Never guess control properties or enum names; use `describe_control`.
-- Control names must be unique across the entire app.
-- Never add a version suffix to a `Control:` value.
-- Compile early, after builder waves, and after targeted repairs.
-- Do not rebuild completed screens to address ordinary compile diagnostics; repair them in place.
-- Do not report completion until compilation is clean or remaining diagnostics are explicit.
-
-## Upstream baseline
-
-This release tracks Microsoft Canvas Apps plugin v3.0.3 at commit
-`0b9b0389607c6c45c1dfee2714f4c12f152111f3`. Microsoft workflow behavior is the source of truth;
-the adaptations above take precedence where host packaging or tool names differ.
+Package 3.1.0-codex.1 incorporates Microsoft Canvas Apps v3.1.0 from source snapshot
+8a10052386a56376bb47162a0e2094d727164b94. Repository static validation passed; live Power Apps
+Studio testing was skipped. See README.md's Validation section for coverage and unresolved
+host/runtime validation limits. This baseline records incorporated source, not live-test
+certification. Preserve these qualifications in release communications.

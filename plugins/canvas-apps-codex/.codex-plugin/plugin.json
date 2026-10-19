@@ -1,6 +1,6 @@
 {
   "name": "canvas-apps-codex",
-  "version": "3.0.3-codex.1",
+  "version": "3.1.0-codex.1",
   "description": "Create, edit, validate, and sync Power Apps Canvas Apps using Codex and the Canvas Authoring MCP server.",
   "author": {
     "name": "Justin de Vantier",

@@ -2,13 +2,16 @@
 
 This repository contains a Codex-compatible adaptation of the Canvas Apps plugin from Microsoft's Power Platform skills repository.
 
-The `3.0.3-codex.1` release is based on upstream commit
-`0b9b0389607c6c45c1dfee2714f4c12f152111f3`.
+The `3.1.0-codex.1` release adapts Microsoft Canvas Apps plugin v3.1.0 from upstream commit
+`8a10052386a56376bb47162a0e2094d727164b94`.
+
+Repository static validation passed; live Power Apps Studio testing was skipped.
+This baseline records the incorporated source, not a claim of live integration testing.
 
 Original upstream source:
 
 ```text
-https://github.com/microsoft/power-platform-skills/tree/main/plugins/canvas-apps
+https://github.com/microsoft/power-platform-skills/tree/8a10052386a56376bb47162a0e2094d727164b94/plugins/canvas-apps
 ```
 
 Additional reference source:
